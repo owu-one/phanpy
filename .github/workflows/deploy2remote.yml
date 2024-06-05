@@ -1,0 +1,31 @@
+name: Deploy to remote
+on: [push, workflow_dispatch]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:       
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: true # Checkout private submodules(themes or something else).
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+      - name: Build
+        run: |
+          rm .env .env.production
+          echo -e "PHANPY_CLIENT_NAME=${{ secrets.PHANPY_CLIENT_NAME }}\nPHANPY_DEFAULT_INSTANCE_REGISTRATION_URL=${{secrets.PHANPY_DEFAULT_INSTANCE_REGISTRATION_URL}}\nPHANPY_GIPHY_API_KEY=${{secrets.PHANPY_GIPHY_API_KEY}}\nPHANPY_IMG_ALT_API_URL=${{secrets.PHANPY_IMG_ALT_API_URL}}\nPHANPY_LINGVA_INSTANCES=${{secrets.PHANPY_LINGVA_INSTANCES}}\nPHANPY_WEBSITE=${{secrets.PHANPY_WEBSITE}}\nVITE_APP_ENV=production" > .env
+          npm install
+          npm run build
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.7.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+      - name: Add known host
+        run:
+          echo "${{ secrets.SSH_KNOWN_HOSTS }}" >> ~/.ssh/known_hosts
+      - name: Publish to remote
+        run: |
+          apt update && apt install rsync -y
+          rsync -av --delete -e "ssh -p ${{ secrets.SSH_PORT }}" dist/ ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:${{ secrets.WEB_ROOT }}
