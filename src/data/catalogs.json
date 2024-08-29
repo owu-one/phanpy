@@ -75,7 +75,7 @@
     "code": "it-IT",
     "nativeName": "italiano",
     "name": "Italian",
-    "completion": 30
+    "completion": 34
   },
   {
     "code": "ja-JP",
@@ -93,7 +93,7 @@
     "code": "ko-KR",
     "nativeName": "한국어",
     "name": "Korean",
-    "completion": 84
+    "completion": 85
   },
   {
     "code": "lt-LT",
