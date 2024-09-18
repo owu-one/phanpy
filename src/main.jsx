@@ -50,13 +50,17 @@ setTimeout(() => {
 
 // Service worker cache cleanup
 if ('serviceWorker' in navigator && typeof caches !== 'undefined') {
-  const MAX_SW_CACHE_SIZE = 300;
-  let swInterval = setInterval(() => {
+  const MAX_SW_CACHE_SIZE = 50;
+  const IGNORE_CACHE_KEYS = ['icons'];
+  let clearRanOnce = false;
+  const FAST_INTERVAL = 10_000; // 10 seconds
+  const SLOW_INTERVAL = 60 * 60 * 1000; // 1 hour
+  async function clearCaches() {
     if (window.__IDLE__) {
-      clearInterval(swInterval);
-      (async () => {
+      try {
         const keys = await caches.keys();
         for (const key of keys) {
+          if (IGNORE_CACHE_KEYS.includes(key)) continue;
           const cache = await caches.open(key);
           const _keys = await cache.keys();
           if (_keys.length > MAX_SW_CACHE_SIZE) {
@@ -67,9 +71,13 @@ if ('serviceWorker' in navigator && typeof caches !== 'undefined') {
             }
           }
         }
-      })();
+        clearRanOnce = true;
+      } catch (e) {} // Silent fail
     }
-  }, 15_000);
+    // Once cleared, clear again at slower interval
+    setTimeout(clearCaches, clearRanOnce ? SLOW_INTERVAL : FAST_INTERVAL);
+  }
+  setTimeout(clearCaches, FAST_INTERVAL);
 }
 
 window.__CLOAK__ = () => {
