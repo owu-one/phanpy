@@ -99,13 +99,13 @@
     "code": "lt-LT",
     "nativeName": "lietuvių",
     "name": "Lithuanian",
-    "completion": 80
+    "completion": 85
   },
   {
     "code": "nb-NO",
     "nativeName": "norsk bokmål",
     "name": "Norwegian Bokmål",
-    "completion": 8
+    "completion": 28
   },
   {
     "code": "nl-NL",
