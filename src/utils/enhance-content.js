@@ -218,7 +218,7 @@ function _enhanceContent(content, opts = {}) {
       if (TWITTER_MENTION_REGEX.test(html)) {
         html = html.replaceAll(
           TWITTER_MENTION_CAPTURE_REGEX,
-          '<a href="https://twitter.com/$2" rel="nofollow noopener noreferrer" target="_blank">$1</a>',
+          '<a href="https://twitter.com/$2" rel="nofollow noopener" target="_blank">$1</a>',
         );
       }
       fauxDiv.innerHTML = html;
@@ -294,7 +294,7 @@ function _enhanceContent(content, opts = {}) {
   // Workaround for Safari so that `text-decoration-thickness` works
   // Wrap child text nodes in spans
   for (const node of dom.childNodes) {
-    if (node.nodeType === Node.TEXT_NODE) {
+    if (node.nodeType === Node.TEXT_NODE && node.textContent.trim?.()) {
       const span = document.createElement('span');
       span.textContent = node.textContent;
       dom.replaceChild(span, node);
